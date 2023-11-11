@@ -17,9 +17,4 @@ where
         process::exit(1);
     });
     *config
-    
-    // let mut args_iter = args.into_iter();
-    // let command_name = args_iter.next().unwrap();
-    // let final_args : Vec<String> = args_iter.collect();
-    // (command_name, final_args.into_iter().tuples().collect())
 }
