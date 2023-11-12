@@ -2,8 +2,16 @@
 mod editor;
 mod config;
 mod terminal;
+mod cursor;
+mod document;
+mod row;
+
+
 //reexport
+pub use row::Row;
+pub use document::Document;
 pub use terminal::Terminal;
+pub use cursor::Position;
 
 use std::process;
 
