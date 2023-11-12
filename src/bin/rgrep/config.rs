@@ -1,4 +1,4 @@
-use std::{collections::HashMap, process};
+use std::collections::HashMap;
 
 use itertools::Itertools;
 use rtools::parser::Parsable;
@@ -10,18 +10,9 @@ pub struct GrepConfig {
 
 impl Parsable for GrepConfig {
     fn build(mut args: impl Iterator<Item=String>) -> Result<Box<Self>, &'static str> {
-        args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
-        let term = args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
-        let path = args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
+        args.next().ok_or("Please format the command properly")?;
+        let term = args.next().ok_or("There was an error in parsing arguments")?;
+        let path = args.next().ok_or("There was an error in parsing arguments")?;
         let options = args.tuples().collect();
 
         Ok(Box::new(GrepConfig { term, path, options}))

@@ -1,4 +1,3 @@
-use std::process;
 use rtools::parser::Parsable;
 
 pub struct ManConfig {
@@ -7,10 +6,7 @@ pub struct ManConfig {
 
 impl Parsable for ManConfig {
     fn build(mut args : impl Iterator<Item=String>) -> Result<Box<Self>, &'static str> {
-        args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
+        args.next().ok_or("There was an error in parsing arguments")?;
         let command = args.next().unwrap_or_else(|| {
             String::from("")
         });

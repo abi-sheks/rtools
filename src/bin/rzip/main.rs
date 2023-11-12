@@ -1,6 +1,6 @@
 // extern crate flate2;
 
-use std::{process, time::Duration};
+use std::process;
 
 // use rtools::parser::parse_args;
 // use std::fs::File;

@@ -1,5 +1,4 @@
-use std::{collections::HashMap, process};
-use itertools::Itertools;
+use std::collections::HashMap;
 use rtools::parser::Parsable;
 
 
@@ -12,18 +11,9 @@ pub struct ZipConfig {
 
 impl Parsable for ZipConfig {
     fn build(mut args : impl Iterator<Item=String>) -> Result<Box<Self>, &'static str> {
-        args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
-        let source = args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
-        let target = args.next().unwrap_or_else(|| {
-            eprintln!("There was an error in parsing arguments");
-            process::exit(1);
-        });
+        args.next().ok_or("There was an error in parsing arguments")?;
+        let source = args.next().ok_or("There was an error in parsing arguments")?;
+        let target = args.next().ok_or("There was an error in parsing arguments")?;
         let unzip_option = match args.next() {
             Some(unzip) => unzip,
             None => "".to_string(),
