@@ -1,5 +1,5 @@
 # rtools
-Rtools is a command line tool suite written in Rust. Contains basic rust implementations of common tools like grep, find, and gzip, and a command line text editor akin to nano.  
+Rtools is a command line tool suite written in Rust. Contains basic rust implementations of common tools like grep, find, and gzip, and a command line text editor akin to nano (huge shoutout to [this tutorial](https://www.flenker.blog/hecto/)).  
 ***Note*** : Commands are not globally executable yet as this is still a work in progress.
 ## Setup
 - Clone the repository and ```cd``` into it. 
