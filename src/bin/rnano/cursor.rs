@@ -1,6 +1,6 @@
 use termion::event::Key;
 
-use crate::{terminal::Dimensions, Document, Terminal};
+use crate::{Document, Terminal};
 
 #[derive(Default)]
 pub struct Position {
@@ -46,14 +46,14 @@ pub fn move_cursor(terminal : &Terminal, document: &Document, key: Key, cursor_p
         }
         Key::PageUp => {
             y = if y > terminal_height {
-                y - terminal_height
+                y.saturating_sub(terminal_height)
             } else {
                 0
             }
         },
         Key::PageDown =>{
             y = if y.saturating_add(terminal_height) < height {
-                y + terminal_height as usize
+                y.saturating_add(terminal_height)
             } else {
                 height
             }

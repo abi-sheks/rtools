@@ -8,12 +8,11 @@ pub struct Row {
 
 impl From<&str> for Row {
     fn from(value: &str) -> Self {
-        let mut initial_row = Self {
+
+        Self {
             text: String::from(value),
-            len: 0,
-        };
-        initial_row.update_len();
-        initial_row
+            len: value.graphemes(true).count(),
+        }
     }
 }
 
@@ -40,7 +39,65 @@ impl Row {
         self.text.is_empty()
     }
 
-    pub fn update_len(&mut self) {
-        self.len = self.text[..].graphemes(true).count();
+    pub fn insert(&mut self, c: char, position: usize) {
+        if position >= self.len() {
+            self.text.push(c);
+            self.len += 1;
+            return;
+        }
+        let mut result = String::new();
+        let mut length = 0;
+        for (index, grapheme) in self.text[..].graphemes(true).enumerate() {
+            length += 1;
+            if index == position {
+                length += 1;
+                result.push(c);
+            }
+            result.push_str(grapheme);
+        }
+        self.len = length;
+        self.text = result;
+    }
+    pub fn delete(&mut self, position: usize) {
+        if position >= self.len() {
+            return;
+        }
+        let mut result = String::new();
+        let mut length = 0;
+        for (index, grapheme) in self.text[..].graphemes(true).enumerate() {
+            if index != position {
+                length += 1;
+                result.push_str(grapheme);
+            }
+        }
+        self.len = length;
+        self.text = result;
+    }
+    pub fn append(&mut self, new: &Self) {
+        self.text = format!("{}{}", self.text, new.text);
+        self.len += new.len;
+    }
+
+    pub fn split_row(&mut self, position: usize) -> Self {
+        let mut row: String = String::new();
+        let mut length = 0;
+        let mut splitted_row: String = String::new();
+        let mut splitted_length = 0;
+        for (index, grapheme) in self.text[..].graphemes(true).enumerate() {
+            if index < position {
+                length += 1;
+                row.push_str(grapheme);
+            } else {
+                splitted_length += 1;
+                splitted_row.push_str(grapheme);
+            }
+        }
+
+        self.text = row;
+        self.len = length;
+        Self {
+            text: splitted_row,
+            len: splitted_length,
+        }
     }
 }
