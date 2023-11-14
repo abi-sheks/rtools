@@ -35,6 +35,12 @@ fn main() {
             Usage : rnano <file_name>
             Note : <file_name> is a required argument. if it does not exist, it will be created in the working directory.")
         }
+        "rsort" => {
+            println!("The rsort tool sorts and displays the contents of a given file in lexicographical order.\n
+            Usage : rsort <file_name>
+            "
+        )
+        }
         &_ => {
             eprintln!("Please enter a valid rtools command. (rgrep, rzip, rfind, rnano)");
         }

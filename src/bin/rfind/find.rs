@@ -3,7 +3,7 @@ use std::{path::Path, time::{Instant, Duration}, io::{self, Error}, fs};
 use regex::Regex;
 
 
-
+#[derive(Default)]
 pub struct Find {
     //query stored as it is used in print_results
     results: Vec<String>,
@@ -11,9 +11,6 @@ pub struct Find {
 
 
 impl Find {
-    pub fn new() -> Find {
-        Find {results : Vec::new()}
-    }
 
     pub fn print_results(&self) {
         //bad paradigm, this should return something. Printing should happen in main

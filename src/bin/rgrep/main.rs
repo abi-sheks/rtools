@@ -7,7 +7,7 @@ mod config;
 fn main() {
     let grep_config : config::GrepConfig = parse_args();
 
-    let mut new_search = search::Search::new();
+    let mut new_search = search::Search::default();
 
     //safer to pass references to config fields than actual object as recursive definition internally cahanges the config fields. 
     let elapsed_time = new_search.recurse_and_populate(

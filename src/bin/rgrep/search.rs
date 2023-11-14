@@ -6,6 +6,7 @@ use std::{
 use regex::Regex;
 use colored::Colorize;
 
+#[derive(Default)]
 pub struct Search {
     //query stored as it is used in print_results
     query : String,
@@ -18,10 +19,7 @@ struct SearchResult {
 }
 
 impl Search {
-
-    pub fn new() -> Search {
-        Search {results : Vec::new(), query : String::from("")}
-    }
+    
     pub fn print_results(&self) -> () {
         for result in self.results.iter() {
             let start_index = result.content.find(&self.query[..]).unwrap();
