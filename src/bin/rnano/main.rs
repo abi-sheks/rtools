@@ -2,6 +2,7 @@
 mod editor;
 mod config;
 mod terminal;
+mod highlighting;
 mod cursor;
 mod document;
 mod row;

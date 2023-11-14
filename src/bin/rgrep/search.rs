@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf}, io,
     time::{Instant, Duration},
 };
-
+use regex::Regex;
 use colored::Colorize;
 
 pub struct Search {
@@ -51,8 +51,9 @@ impl Search {
         Ok(start.elapsed())
     }
     fn search_in_file<'a>(&mut self, term: &'a str, file_name: &Path) -> Result<(), io::Error>{
+        let re = Regex::new(term).unwrap();
         let content = fs::read_to_string(file_name)?;
-        if content.contains(term) {
+        if content.contains(term) || re.is_match(&content) {
             self.results.push(SearchResult { content, file_name : Box::new(file_name.to_owned()) });
         }
         Ok(())

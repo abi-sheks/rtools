@@ -13,23 +13,30 @@ fn main() {
                       Usage : rman <command>");
         },  
         "rgrep" => {
-            println!("The rgrep tool can be used to find matches for a search term in a particular directory\n
+            println!("The rgrep tool can be used to find matches for a search term in a particular directory.\n
                       Usage : rgrep <search_term> <file/directory>
+                      The search term can be a valid regex.
             ");
         },
         "rzip" => {
             println!("The rzip tool can be used to zip files in the gzip compression format and uncompress file data that is in gzip compression format. \n
-            Usage : rzip <source> <target>\n
-            Options : \n
-            --unzip : Unzips source and writes to target.
+            Usage : rzip <source> <target>
+            Options : 
+                --unzip : Unzips source and writes to target.
             ")
         },
         "rfind" => {
             println!("The rfind tool can be used to find instances of a specified file in a folder, returning the full path of each instance.\n
-            Usage : rfind <directory> <file_name>")
+            Usage : rfind <directory> <file_name>
+            The file name can be a valid regex.")
+        }
+        "rnano" => {
+            println!("The rnano tool invokes a command line text editor.\n
+            Usage : rnano <file_name>
+            Note : <file_name> is a required argument. if it does not exist, it will be created in the working directory.")
         }
         &_ => {
-            eprintln!("Please enter a valid rtools command. (rgrep, rzip)");
+            eprintln!("Please enter a valid rtools command. (rgrep, rzip, rfind, rnano)");
         }
     }
 }

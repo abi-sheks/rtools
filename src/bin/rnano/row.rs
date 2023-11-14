@@ -1,16 +1,20 @@
 use unicode_segmentation::UnicodeSegmentation;
 
+use crate::editor::SearchDirection;
+use crate::highlighting;
+
 #[derive(Default)]
 pub struct Row {
     pub text: String,
+    highlighting : Vec<highlighting::Type>,
     pub len: usize,
 }
 
 impl From<&str> for Row {
     fn from(value: &str) -> Self {
-
         Self {
             text: String::from(value),
+            highlighting : Vec::new(),
             len: value.graphemes(true).count(),
         }
     }
@@ -29,6 +33,37 @@ impl Row {
             }
         }
         result
+    }
+
+    pub fn find(&self, query: &str, at: usize, direction: SearchDirection) -> Option<usize> {
+        //basically, string.find() returns byte index, but we want grapheme index (complex languages, grapheme != byte). so we iterate over every grapheme, using a combination of grapheme_indices (returns (g_index, g) and enumerate on g, (byte_index, g) to compare byte_index but return grapheme index.)
+        if at > self.len {
+            return None;
+        }
+        let start = if direction == SearchDirection::Forward {
+            at
+        } else {
+            0
+        };
+        let end = if direction == SearchDirection::Forward {
+            self.len
+        } else {
+            at
+        };
+        let substring: String = self.text[..].graphemes(true).skip(start).take(end-start).collect();
+        let matching_byte_index = if direction == SearchDirection::Forward {
+            substring.find(query)
+        } else {
+            substring.rfind(query)
+        };
+        if let Some(mbi) = matching_byte_index {
+            for (grapheme_index, (byte_index, _)) in substring[..].grapheme_indices(true).enumerate() {
+                if mbi == byte_index {
+                    return Some(start + grapheme_index);
+                }
+            }
+        }
+        None
     }
 
     pub fn len(&self) -> usize {
@@ -78,6 +113,18 @@ impl Row {
         self.len += new.len;
     }
 
+    pub fn highlight(&mut self) {
+        let mut highlighting = Vec::new();
+        for c in self.text.chars() {
+            if c.is_ascii_digit() {
+                highlighting.push(highlighting::Type::Number);
+            } else {
+                highlighting.push(highlighting::Type::None)
+            }
+        }
+        self.highlighting = highlighting;
+    }
+
     pub fn split_row(&mut self, position: usize) -> Self {
         let mut row: String = String::new();
         let mut length = 0;
@@ -98,6 +145,7 @@ impl Row {
         Self {
             text: splitted_row,
             len: splitted_length,
+            highlighting : Vec::new(),
         }
     }
 }

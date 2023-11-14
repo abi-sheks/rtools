@@ -30,6 +30,13 @@ impl StatusMessage {
     }
 }
 
+
+#[derive(PartialEq, Clone, Copy)]
+pub enum SearchDirection {
+    Forward,
+    Backward
+}
+
 pub struct Editor {
     pub file_name: String,
     exited: bool,
@@ -48,7 +55,8 @@ pub struct Editor {
 
 impl Editor {
     pub fn build(config: EditorConfig) -> Result<Editor, io::Error> {
-        let mut initial_status = String::from("Press Ctrl-C to quit, Ctrl-S to save");
+        let mut initial_status =
+            String::from("Press Ctrl-C to quit, Ctrl-S to save, Ctrl-D to find");
         let current_document = match Document::open(&config.file_name) {
             Ok(doc) => doc,
             Err(_) => {
@@ -200,13 +208,17 @@ impl Editor {
         }
     }
 
-    fn prompt_for_search(&mut self, prompt: &str) -> Result<String, Error> {
+    fn prompt_for_search<F>(&mut self, prompt: &str, mut f: F) -> Result<Option<String>, Error>
+    where
+        F: FnMut(&mut Self, Key, &String),
+    {
         let mut result = String::new();
         loop {
             self.status_message = StatusMessage::from(format!("{} {}", prompt, result));
             self.refresh_screen()?;
             //only need to handle this case
-            match Terminal::read_key()? {
+            let key = Terminal::read_key()?;
+            match key {
                 Key::Char('\n') => break,
                 Key::Char(c) => {
                     if !c.is_control() {
@@ -215,16 +227,50 @@ impl Editor {
                 }
                 //even have to handle this low level case lmao
                 Key::Backspace => {
-                        result.truncate(result.len().saturating_sub(1));
+                    result.truncate(result.len().saturating_sub(1));
                 }
                 Key::Esc => {
                     result.truncate(0);
                     break;
                 }
-                _ => continue,
+                _ => (),
             };
+            f(self, key, &result)
         }
-        Ok(result)
+        Ok(Some(result))
+    }
+
+    fn search(&mut self) {
+        //only handling match cases leads to easier UX
+        let pos_before_search = self.cursor_position.clone();
+        let mut direction = SearchDirection::Forward;
+        let query = self
+            .prompt_for_search("Search(Press ESC to cancel, arrow keys to navigate) : ", |editor, key, query| {
+                let mut moved = false;
+                match key {
+                    Key::Right | Key::Down => {
+                        direction = SearchDirection::Forward;
+                        cursor::move_cursor(&editor.terminal, &editor.current_document, key, &mut editor.cursor_position);
+                        moved = true;
+                    },
+                    Key::Left | Key::Up => {
+                        direction = SearchDirection::Backward;
+                    }
+                    _ => direction = SearchDirection::Forward,
+                }
+                if let Some(pos) = editor.current_document.find(&query, &editor.cursor_position, direction) {
+                    editor.cursor_position = pos;
+                    editor.scroll();
+                } else if moved {
+                    cursor::move_cursor(&editor.terminal, &editor.current_document, Key::Left, &mut editor.cursor_position)
+                }
+            })
+            .unwrap_or(None);
+        
+            if query.is_none() {
+            self.cursor_position = pos_before_search;
+            self.scroll();
+        }
     }
 
     fn handle_keypress(&mut self) -> Result<(), Error> {
@@ -250,6 +296,9 @@ impl Editor {
                 } else {
                     self.status_message = StatusMessage::from("Error in saving file".to_string());
                 }
+            }
+            Key::Ctrl('d') => {
+                self.search();
             }
             Key::Char(c) => {
                 self.current_document.insert(&self.cursor_position, c)?;

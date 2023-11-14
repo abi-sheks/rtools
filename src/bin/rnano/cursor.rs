@@ -2,7 +2,7 @@ use termion::event::Key;
 
 use crate::{Document, Terminal};
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Position {
     pub x: usize,
     pub y: usize,

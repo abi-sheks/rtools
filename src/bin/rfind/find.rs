@@ -1,5 +1,7 @@
 use std::{path::Path, time::{Instant, Duration}, io::{self, Error}, fs};
 
+use regex::Regex;
+
 
 
 pub struct Find {
@@ -33,8 +35,10 @@ impl Find {
                 if path.is_dir() {
                     self.recurse_and_find(&path, file_name)?;
                 } else {
+                    let last_segment = path.to_str().unwrap().split("/").last().unwrap();
+                    let file_name_as_re = Regex::new(file_name.to_str().unwrap()).unwrap();
                     //ouch
-                    if path.to_str().unwrap().split("/").last().unwrap() == file_name.to_str().unwrap() {
+                    if last_segment == file_name.to_str().unwrap() || file_name_as_re.is_match(last_segment){
                         self.results.push(path.to_str().unwrap().to_string());
                     }
                 }
